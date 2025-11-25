@@ -223,15 +223,6 @@
     <div class="touch-btn" id="rightBtn">▶</div>
   </div>
 
-  <audio id="musicBg" src="sound/bgm.mp3" preload="auto"></audio>
-  <audio id="transmiting" src="sound/step.mp3" preload="auto"></audio>
-  <audio id="hurt" src="sound/hurt.mp3" preload="auto"></audio>
-  <audio id="fade" src="sound/fade.mp3" preload="auto"></audio>
-  <audio id="dead" src="sound/help.mp3" preload="auto"></audio>
-  <audio id="step" src="sound/step.mp3" preload="auto"></audio>
-  <audio id="jump" src="sound/jump.mp3" preload="auto"></audio>
-  <audio id="correct" src="https://actions.google.com/sounds/v1/cartoon/pop.ogg" preload="auto"></audio> 
-  
   <script>
     //環境變數
     var updateFPS = 30
@@ -249,14 +240,7 @@
     gui.close(); 
     document.querySelector('.dg.ac').style.display = 'none';
 
-    var bgm = document.getElementById('musicBg');
-    bgm.volume = 0.4;
-    document.getElementById('transmiting').volume=0.3
-    document.getElementById('step').volume=0.7
-    bgm.addEventListener('ended', function(){
-      this.currentTime = 0;
-      this.play();
-    }, false);
+    // Audio setup removed
 
     //------------------------
     // Helpers for Formatting
@@ -365,10 +349,9 @@
       this.lineTo(v2.x,v2.y)
     }
 
+    // Empty function to prevent errors when game logic calls for sound
     function playSound(id){
-      var sound = document.getElementById(id);
-      sound.currentTime=0
-      sound.play().catch(e => console.log(e)); 
+      // Sound disabled
     }
 
     function getLeaderboard() {
@@ -594,7 +577,7 @@
       }
       
       start(){
-        document.getElementById('musicBg').play().catch(e=>console.log("Audio play failed"));
+        // Audio play removed
         document.getElementById('startBtn').style.display = 'none';
         document.getElementById('leaderboard').style.display = 'none';
         this.init()
@@ -639,9 +622,11 @@
           
           if (newType === "normal" || newType === "jump") {
             const roll = Math.random();
-            if (roll < 0.4) {
+            // --- MODIFIED FREQUENCY HERE ---
+            // Increased correct answer probability from 0.4 to 0.7
+            if (roll < 0.7) {
                 newWall.label = this.correctAnswer;
-            } else if (roll < 0.8) {
+            } else if (roll < 0.95) { // Wrong answer probability adjusted
                 newWall.label = this.wrongAnswer;
             }
           }
@@ -665,7 +650,7 @@
         
         if (!touching){
           this.player.lastBlock=null
-          document.getElementById("transmiting").pause()
+          // Audio pause removed
         }
 
         this.walls = this.walls.filter(wall=>wall.active)
@@ -961,12 +946,12 @@
         if (this.type=="slideLeft"){ 
           player.p.x-=3
           player.p.y = this.p.y
-             document.getElementById("transmiting").play()
+             // Audio removed
         }
         if (this.type=="slideRight"){
           player.p.x+=3
           player.p.y = this.p.y
-             document.getElementById("transmiting").play()
+             // Audio removed
         }
         if (this.type=="fade"){
           player.p.y-=2
