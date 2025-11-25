@@ -240,8 +240,6 @@
     gui.close(); 
     document.querySelector('.dg.ac').style.display = 'none';
 
-    // Audio setup removed
-
     //------------------------
     // Helpers for Formatting
     //------------------------
@@ -420,9 +418,10 @@
         this.walls = []
         this.width = Math.min(window.innerWidth, 700) 
         this.height = wh
+        // REMOVED "hurt" from walltypes
         this.walltypes = [
           "normal","jump","slideLeft","slideRight",
-          "hurt","fade"
+          "fade"
         ]
         this.hurt=0
         this.playing=false
@@ -440,13 +439,10 @@
       }
       
       generateMathProblem() {
-        // Randomly select Question Type
-        // 0-0.3: Add/Sub, 0.3-0.6: Mult, 0.6-1.0: Div
         const typeRoll = Math.random();
         const vars = ["x", "y", "a"];
         const v = vars[Math.floor(Math.random() * vars.length)];
 
-        // Helper to format term: 5, x, 2 => 5x²
         const fmt = (coeff, variable, pow) => {
             if (coeff === 0) return "0";
             let s = "";
@@ -461,17 +457,14 @@
         };
 
         if (typeRoll < 0.3) {
-            // --- TYPE 1: Addition / Subtraction ---
             let n1 = Math.floor(Math.random() * 10) + 2;
             let n2 = Math.floor(Math.random() * 10) + 2;
             
             if (Math.random() > 0.5) {
-                // Add: 3x + 4x
                 this.mathQuestion = `${n1}${v} + ${n2}${v} = ?`;
                 this.correctAnswer = (n1 + n2) + v;
-                this.wrongAnswer = (n1 + n2 + 1) + v; // Arithmetic error
+                this.wrongAnswer = (n1 + n2 + 1) + v; 
             } else {
-                // Sub: 5x - 2x
                 this.mathQuestion = `${n1}${v} - ${n2}${v} = ?`;
                 this.correctAnswer = (n1 - n2) + v;
                 if (this.correctAnswer === "0" + v) this.correctAnswer = "0";
@@ -479,78 +472,54 @@
             }
 
         } else if (typeRoll < 0.65) {
-            // --- TYPE 2: Multiplication (Index Law) ---
-            // 2x^2 * 3x^3 = 6x^5
-            let c1 = Math.floor(Math.random() * 5) + 2; // 2 to 6
+            let c1 = Math.floor(Math.random() * 5) + 2; 
             let c2 = Math.floor(Math.random() * 5) + 2;
-            let p1 = Math.floor(Math.random() * 3) + 2; // 2 to 4
+            let p1 = Math.floor(Math.random() * 3) + 2; 
             let p2 = Math.floor(Math.random() * 3) + 2;
             
             let term1 = fmt(c1, v, p1);
             let term2 = fmt(c2, v, p2);
             
             this.mathQuestion = `${term1} × ${term2} = ?`;
-            
-            // Correct: Coeff Multiply, Powers Add
             this.correctAnswer = fmt(c1*c2, v, p1+p2);
             
-            // Wrong 1: Multiply powers instead of add
-            // Wrong 2: Add coeffs instead of multiply
             if (Math.random() > 0.5) {
-                this.wrongAnswer = fmt(c1*c2, v, p1*p2); // Power error
+                this.wrongAnswer = fmt(c1*c2, v, p1*p2); 
             } else {
-                this.wrongAnswer = fmt(c1+c2, v, p1+p2); // Coeff error
+                this.wrongAnswer = fmt(c1+c2, v, p1+p2); 
             }
-            
             if (this.wrongAnswer === this.correctAnswer) this.wrongAnswer = fmt(c1*c2 + 2, v, p1+p2);
 
         } else {
-            // --- TYPE 3: Division (Index Law) ---
-            // Fraction: (A * x^p1 * y^p2) / (B * x^p3)
+            let divisorC = Math.floor(Math.random() * 4) + 2; 
+            let multiplier = Math.floor(Math.random() * 4) + 1; 
+            let dividendC = divisorC * multiplier; 
             
-            let divisorC = Math.floor(Math.random() * 4) + 2; // 2 to 5
-            let multiplier = Math.floor(Math.random() * 4) + 1; // 1 to 4
-            let dividendC = divisorC * multiplier; // Ensures clean division
-            
-            let pBottom = Math.floor(Math.random() * 3) + 1; // 1 to 3
-            let pDiff = Math.floor(Math.random() * 5) - 2; // -2 to +2 diff
-            // if pDiff is 0, variables cancel out
+            let pBottom = Math.floor(Math.random() * 3) + 1; 
+            let pDiff = Math.floor(Math.random() * 5) - 2; 
             
             let pTop = pBottom + pDiff;
-            if (pTop < 1) pTop = 1; // Ensure top has at least x
+            if (pTop < 1) pTop = 1; 
             
-            // Update diff based on correction
             pDiff = pTop - pBottom;
 
-            // Setup Question strings
-            // Need to form a vertical fraction for the question string if possible
             let tTop = fmt(dividendC, v, pTop);
             let tBot = fmt(divisorC, v, pBottom);
             
             this.mathQuestion = `${tTop}_over_${tBot}`;
 
-            // Calculate Answer
             let ansC = dividendC / divisorC;
             let ansP = pTop - pBottom;
             
-            // Format Answer (Fraction handling)
             if (ansP >= 0) {
-                // Result is not a fraction: 3x^2 or 3
                 this.correctAnswer = fmt(ansC, v, ansP);
-                
-                // Wrong answer: Add powers instead of subtract
                 this.wrongAnswer = fmt(ansC, v, pTop+pBottom);
             } else {
-                // Result is fraction: 3 / x^2
                 let denP = Math.abs(ansP);
-                let botStr = fmt(1, v, denP); // x^2
+                let botStr = fmt(1, v, denP); 
                 this.correctAnswer = `${ansC}_over_${botStr}`;
-                
-                // Wrong: 3x^2 (forgot it's denominator)
                 this.wrongAnswer = fmt(ansC, v, denP);
             }
-            
-            // Edge case collision check
             if (this.wrongAnswer === this.correctAnswer) {
                  this.wrongAnswer = fmt(ansC + 1, v, 0);
             }
@@ -577,7 +546,6 @@
       }
       
       start(){
-        // Audio play removed
         document.getElementById('startBtn').style.display = 'none';
         document.getElementById('leaderboard').style.display = 'none';
         this.init()
@@ -622,11 +590,11 @@
           
           if (newType === "normal" || newType === "jump") {
             const roll = Math.random();
-            // --- MODIFIED FREQUENCY HERE ---
-            // Increased correct answer probability from 0.4 to 0.7
-            if (roll < 0.7) {
+            // --- UPDATED FREQUENCY ---
+            // 60% Correct, 35% Wrong, 5% Empty
+            if (roll < 0.6) {
                 newWall.label = this.correctAnswer;
-            } else if (roll < 0.95) { // Wrong answer probability adjusted
+            } else if (roll < 0.95) { 
                 newWall.label = this.wrongAnswer;
             }
           }
@@ -650,7 +618,6 @@
         
         if (!touching){
           this.player.lastBlock=null
-          // Audio pause removed
         }
 
         this.walls = this.walls.filter(wall=>wall.active)
@@ -715,7 +682,6 @@
         ctx.fillText("Basement：" + (parseInt(this.time/100)) + "/F", uiCenterX, 80);
         
         ctx.fillStyle='#ffdd38';
-        // Draw the question using the formal renderer
         drawFormalExpression(ctx, "Simplify: " + this.mathQuestion, uiCenterX, 130, fontSize * 1.2, '#ffdd38', 'center');
         
         ctx.textAlign = "start"; 
